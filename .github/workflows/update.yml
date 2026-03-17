@@ -1,0 +1,35 @@
+name: Update Payroll Schedule
+
+on:
+  schedule:
+    - cron: '0 9 1 */2 *'   # Every 2 months
+  workflow_dispatch:          # Manual trigger button
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pandas lxml
+
+      - name: Run script
+        run: python update_schedule.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .
+          publish_branch: gh-pages
