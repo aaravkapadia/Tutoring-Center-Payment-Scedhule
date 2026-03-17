@@ -1,7 +1,17 @@
 import pandas as pd
+import requests
 
-tables = pd.read_html("https://www.laspositascollege.edu/adminservices/payrollandhiring.php")
+url = "https://www.laspositascollege.edu/adminservices/payrollandhiring.php"
+
+# Fetch the page first, then parse
+response = requests.get(url)
+response.raise_for_status()
+
+tables = pd.read_html(response.text)
 df = tables[0]
+
+print("Data pulled successfully:")
+print(df)
 
 html = f"""<!DOCTYPE html>
 <html>
@@ -51,11 +61,11 @@ html = f"""<!DOCTYPE html>
 <body>
     <h1>LPC Payroll Schedule</h1>
     <p class="updated">Auto-updated from LPC website</p>
-    {df.to_html(index=False, classes="schedule")}
+    {df.to_html(index=False)}
 </body>
 </html>"""
 
 with open("index.html", "w") as f:
     f.write(html)
 
-print("Page updated!")
+print("index.html created successfully!")
